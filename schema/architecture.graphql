@@ -314,6 +314,39 @@ type Span {
 }
 
 # ============================================================================
+# SKILL CREATOR CATALOG — directory of orgs publishing Agent Skills
+# Source-of-truth indexer: skills.sh (Official, Community, Partner tiers).
+# Seed data lives in fixtures/skill-creators-official.json; this section is
+# the shape that fixture validates against.
+# ============================================================================
+
+"""A snapshot of a skill creator directory at a moment in time."""
+type SkillCreatorCatalog {
+  source: String!              # e.g. "skills.sh/official"
+  tier: CreatorTier!
+  fetchedAt: DateTime!
+  creators: [SkillCreator!]!
+}
+
+"""An organization that publishes Agent Skills under the agentskills.io spec."""
+type SkillCreator {
+  slug: ID!                    # github org slug, e.g. "anthropics", "vercel-labs"
+  primaryRepo: String!         # primary skills repo, e.g. "skills", "agent-skills"
+  repoCount: Int!              # number of repos contributing skills
+  skillCount: Int!             # total SKILL.md files across those repos
+  catalogUrl: String!          # e.g. "https://www.skills.sh/anthropics"
+  catalog: SkillCreatorCatalog!
+}
+
+"""Tier the catalog source assigns the creator to."""
+enum CreatorTier {
+  official      # makers teaching how to use their own products
+  community
+  partner
+  experimental
+}
+
+# ============================================================================
 # SCALARS
 # ============================================================================
 

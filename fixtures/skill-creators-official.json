@@ -1,0 +1,666 @@
+{
+  "$schema": "../schema/architecture.graphql#SkillCreatorCatalog",
+  "source": "skills.sh/official",
+  "tier": "official",
+  "fetchedAt": "2026-05-21T00:00:00Z",
+  "creators": [
+    {
+      "slug": "anthropics",
+      "primaryRepo": "skills",
+      "repoCount": 18,
+      "skillCount": 546,
+      "catalogUrl": "https://www.skills.sh/anthropics"
+    },
+    {
+      "slug": "apify",
+      "primaryRepo": "agent-skills",
+      "repoCount": 5,
+      "skillCount": 29,
+      "catalogUrl": "https://www.skills.sh/apify"
+    },
+    {
+      "slug": "apollographql",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 15,
+      "catalogUrl": "https://www.skills.sh/apollographql"
+    },
+    {
+      "slug": "astronomer",
+      "primaryRepo": "agents",
+      "repoCount": 1,
+      "skillCount": 29,
+      "catalogUrl": "https://www.skills.sh/astronomer"
+    },
+    {
+      "slug": "auth0",
+      "primaryRepo": "agent-skills",
+      "repoCount": 1,
+      "skillCount": 31,
+      "catalogUrl": "https://www.skills.sh/auth0"
+    },
+    {
+      "slug": "automattic",
+      "primaryRepo": "agent-skills",
+      "repoCount": 8,
+      "skillCount": 37,
+      "catalogUrl": "https://www.skills.sh/automattic"
+    },
+    {
+      "slug": "axiomhq",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 12,
+      "catalogUrl": "https://www.skills.sh/axiomhq"
+    },
+    {
+      "slug": "base",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 21,
+      "catalogUrl": "https://www.skills.sh/base"
+    },
+    {
+      "slug": "better-auth",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 13,
+      "catalogUrl": "https://www.skills.sh/better-auth"
+    },
+    {
+      "slug": "bitwarden",
+      "primaryRepo": "ai-plugins",
+      "repoCount": 3,
+      "skillCount": 63,
+      "catalogUrl": "https://www.skills.sh/bitwarden"
+    },
+    {
+      "slug": "box",
+      "primaryRepo": "box-for-ai",
+      "repoCount": 1,
+      "skillCount": 5,
+      "catalogUrl": "https://www.skills.sh/box"
+    },
+    {
+      "slug": "brave",
+      "primaryRepo": "brave-search-skills",
+      "repoCount": 2,
+      "skillCount": 26,
+      "catalogUrl": "https://www.skills.sh/brave"
+    },
+    {
+      "slug": "browser-use",
+      "primaryRepo": "browser-use",
+      "repoCount": 5,
+      "skillCount": 11,
+      "catalogUrl": "https://www.skills.sh/browser-use"
+    },
+    {
+      "slug": "browserbase",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 16,
+      "catalogUrl": "https://www.skills.sh/browserbase"
+    },
+    {
+      "slug": "callstackincubator",
+      "primaryRepo": "agent-skills",
+      "repoCount": 9,
+      "skillCount": 21,
+      "catalogUrl": "https://www.skills.sh/callstackincubator"
+    },
+    {
+      "slug": "clerk",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 31,
+      "catalogUrl": "https://www.skills.sh/clerk"
+    },
+    {
+      "slug": "clickhouse",
+      "primaryRepo": "agent-skills",
+      "repoCount": 6,
+      "skillCount": 32,
+      "catalogUrl": "https://www.skills.sh/clickhouse"
+    },
+    {
+      "slug": "cloudflare",
+      "primaryRepo": "skills",
+      "repoCount": 17,
+      "skillCount": 137,
+      "catalogUrl": "https://www.skills.sh/cloudflare"
+    },
+    {
+      "slug": "coderabbitai",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 6,
+      "catalogUrl": "https://www.skills.sh/coderabbitai"
+    },
+    {
+      "slug": "coinbase",
+      "primaryRepo": "agentic-wallet-skills",
+      "repoCount": 2,
+      "skillCount": 29,
+      "catalogUrl": "https://www.skills.sh/coinbase"
+    },
+    {
+      "slug": "contentful",
+      "primaryRepo": "skills",
+      "repoCount": 1,
+      "skillCount": 5,
+      "catalogUrl": "https://www.skills.sh/contentful"
+    },
+    {
+      "slug": "contentstack",
+      "primaryRepo": "contentstack-agent-skills",
+      "repoCount": 2,
+      "skillCount": 21,
+      "catalogUrl": "https://www.skills.sh/contentstack"
+    },
+    {
+      "slug": "convex-dev",
+      "primaryRepo": "convex",
+      "repoCount": 1,
+      "skillCount": 9,
+      "catalogUrl": "https://www.skills.sh/convex-dev"
+    },
+    {
+      "slug": "dagster-io",
+      "primaryRepo": "skills",
+      "repoCount": 4,
+      "skillCount": 53,
+      "catalogUrl": "https://www.skills.sh/dagster-io"
+    },
+    {
+      "slug": "dash0hq",
+      "primaryRepo": "agent-skills",
+      "repoCount": 1,
+      "skillCount": 4,
+      "catalogUrl": "https://www.skills.sh/dash0hq"
+    },
+    {
+      "slug": "datadog-labs",
+      "primaryRepo": "agent-skills",
+      "repoCount": 3,
+      "skillCount": 41,
+      "catalogUrl": "https://www.skills.sh/datadog-labs"
+    },
+    {
+      "slug": "dbt-labs",
+      "primaryRepo": "dbt-agent-skills",
+      "repoCount": 1,
+      "skillCount": 14,
+      "catalogUrl": "https://www.skills.sh/dbt-labs"
+    },
+    {
+      "slug": "deepgram",
+      "primaryRepo": "skills",
+      "repoCount": 4,
+      "skillCount": 22,
+      "catalogUrl": "https://www.skills.sh/deepgram"
+    },
+    {
+      "slug": "denoland",
+      "primaryRepo": "skills",
+      "repoCount": 1,
+      "skillCount": 6,
+      "catalogUrl": "https://www.skills.sh/denoland"
+    },
+    {
+      "slug": "elevenlabs",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 12,
+      "catalogUrl": "https://www.skills.sh/elevenlabs"
+    },
+    {
+      "slug": "encoredev",
+      "primaryRepo": "skills",
+      "repoCount": 1,
+      "skillCount": 30,
+      "catalogUrl": "https://www.skills.sh/encoredev"
+    },
+    {
+      "slug": "exploreomni",
+      "primaryRepo": "omni-agent-skills",
+      "repoCount": 3,
+      "skillCount": 27,
+      "catalogUrl": "https://www.skills.sh/exploreomni"
+    },
+    {
+      "slug": "expo",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 17,
+      "catalogUrl": "https://www.skills.sh/expo"
+    },
+    {
+      "slug": "facebook",
+      "primaryRepo": "react",
+      "repoCount": 4,
+      "skillCount": 14,
+      "catalogUrl": "https://www.skills.sh/facebook"
+    },
+    {
+      "slug": "factory-ai",
+      "primaryRepo": "factory-plugins",
+      "repoCount": 3,
+      "skillCount": 43,
+      "catalogUrl": "https://www.skills.sh/factory-ai"
+    },
+    {
+      "slug": "figma",
+      "primaryRepo": "mcp-server-guide",
+      "repoCount": 2,
+      "skillCount": 25,
+      "catalogUrl": "https://www.skills.sh/figma"
+    },
+    {
+      "slug": "firebase",
+      "primaryRepo": "agent-skills",
+      "repoCount": 4,
+      "skillCount": 55,
+      "catalogUrl": "https://www.skills.sh/firebase"
+    },
+    {
+      "slug": "firecrawl",
+      "primaryRepo": "cli",
+      "repoCount": 13,
+      "skillCount": 282,
+      "catalogUrl": "https://www.skills.sh/firecrawl"
+    },
+    {
+      "slug": "flutter",
+      "primaryRepo": "skills",
+      "repoCount": 4,
+      "skillCount": 88,
+      "catalogUrl": "https://www.skills.sh/flutter"
+    },
+    {
+      "slug": "getsentry",
+      "primaryRepo": "skills",
+      "repoCount": 20,
+      "skillCount": 296,
+      "catalogUrl": "https://www.skills.sh/getsentry"
+    },
+    {
+      "slug": "github",
+      "primaryRepo": "awesome-copilot",
+      "repoCount": 8,
+      "skillCount": 396,
+      "catalogUrl": "https://www.skills.sh/github"
+    },
+    {
+      "slug": "google-gemini",
+      "primaryRepo": "gemini-skills",
+      "repoCount": 3,
+      "skillCount": 28,
+      "catalogUrl": "https://www.skills.sh/google-gemini"
+    },
+    {
+      "slug": "google-labs-code",
+      "primaryRepo": "stitch-skills",
+      "repoCount": 4,
+      "skillCount": 30,
+      "catalogUrl": "https://www.skills.sh/google-labs-code"
+    },
+    {
+      "slug": "hashicorp",
+      "primaryRepo": "agent-skills",
+      "repoCount": 5,
+      "skillCount": 74,
+      "catalogUrl": "https://www.skills.sh/hashicorp"
+    },
+    {
+      "slug": "huggingface",
+      "primaryRepo": "skills",
+      "repoCount": 11,
+      "skillCount": 43,
+      "catalogUrl": "https://www.skills.sh/huggingface"
+    },
+    {
+      "slug": "kotlin",
+      "primaryRepo": "kotlin-agent-skills",
+      "repoCount": 1,
+      "skillCount": 4,
+      "catalogUrl": "https://www.skills.sh/kotlin"
+    },
+    {
+      "slug": "langchain-ai",
+      "primaryRepo": "langchain-skills",
+      "repoCount": 6,
+      "skillCount": 84,
+      "catalogUrl": "https://www.skills.sh/langchain-ai"
+    },
+    {
+      "slug": "langfuse",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 22,
+      "catalogUrl": "https://www.skills.sh/langfuse"
+    },
+    {
+      "slug": "launchdarkly",
+      "primaryRepo": "agent-skills",
+      "repoCount": 3,
+      "skillCount": 56,
+      "catalogUrl": "https://www.skills.sh/launchdarkly"
+    },
+    {
+      "slug": "livekit",
+      "primaryRepo": "agent-skills",
+      "repoCount": 1,
+      "skillCount": 1,
+      "catalogUrl": "https://www.skills.sh/livekit"
+    },
+    {
+      "slug": "makenotion",
+      "primaryRepo": "skills",
+      "repoCount": 4,
+      "skillCount": 23,
+      "catalogUrl": "https://www.skills.sh/makenotion"
+    },
+    {
+      "slug": "mapbox",
+      "primaryRepo": "mapbox-agent-skills",
+      "repoCount": 2,
+      "skillCount": 24,
+      "catalogUrl": "https://www.skills.sh/mapbox"
+    },
+    {
+      "slug": "mastra-ai",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 19,
+      "catalogUrl": "https://www.skills.sh/mastra-ai"
+    },
+    {
+      "slug": "mcp-use",
+      "primaryRepo": "mcp-use",
+      "repoCount": 2,
+      "skillCount": 6,
+      "catalogUrl": "https://www.skills.sh/mcp-use"
+    },
+    {
+      "slug": "medusajs",
+      "primaryRepo": "medusa-agent-skills",
+      "repoCount": 2,
+      "skillCount": 30,
+      "catalogUrl": "https://www.skills.sh/medusajs"
+    },
+    {
+      "slug": "microsoft",
+      "primaryRepo": "azure-skills",
+      "repoCount": 44,
+      "skillCount": 547,
+      "catalogUrl": "https://www.skills.sh/microsoft"
+    },
+    {
+      "slug": "n8n-io",
+      "primaryRepo": "n8n",
+      "repoCount": 2,
+      "skillCount": 39,
+      "catalogUrl": "https://www.skills.sh/n8n-io"
+    },
+    {
+      "slug": "neondatabase",
+      "primaryRepo": "agent-skills",
+      "repoCount": 7,
+      "skillCount": 22,
+      "catalogUrl": "https://www.skills.sh/neondatabase"
+    },
+    {
+      "slug": "nuxt",
+      "primaryRepo": "ui",
+      "repoCount": 4,
+      "skillCount": 7,
+      "catalogUrl": "https://www.skills.sh/nuxt"
+    },
+    {
+      "slug": "openai",
+      "primaryRepo": "skills",
+      "repoCount": 8,
+      "skillCount": 276,
+      "catalogUrl": "https://www.skills.sh/openai"
+    },
+    {
+      "slug": "openshift",
+      "primaryRepo": "hypershift",
+      "repoCount": 5,
+      "skillCount": 24,
+      "catalogUrl": "https://www.skills.sh/openshift"
+    },
+    {
+      "slug": "parallel-web",
+      "primaryRepo": "parallel-agent-skills",
+      "repoCount": 2,
+      "skillCount": 14,
+      "catalogUrl": "https://www.skills.sh/parallel-web"
+    },
+    {
+      "slug": "pinecone-io",
+      "primaryRepo": "skills",
+      "repoCount": 4,
+      "skillCount": 18,
+      "catalogUrl": "https://www.skills.sh/pinecone-io"
+    },
+    {
+      "slug": "planetscale",
+      "primaryRepo": "database-skills",
+      "repoCount": 2,
+      "skillCount": 8,
+      "catalogUrl": "https://www.skills.sh/planetscale"
+    },
+    {
+      "slug": "posthog",
+      "primaryRepo": "skills",
+      "repoCount": 7,
+      "skillCount": 253,
+      "catalogUrl": "https://www.skills.sh/posthog"
+    },
+    {
+      "slug": "prisma",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 83,
+      "catalogUrl": "https://www.skills.sh/prisma"
+    },
+    {
+      "slug": "projectopensea",
+      "primaryRepo": "opensea-skill",
+      "repoCount": 1,
+      "skillCount": 1,
+      "catalogUrl": "https://www.skills.sh/projectopensea"
+    },
+    {
+      "slug": "pulumi",
+      "primaryRepo": "agent-skills",
+      "repoCount": 2,
+      "skillCount": 32,
+      "catalogUrl": "https://www.skills.sh/pulumi"
+    },
+    {
+      "slug": "pytorch",
+      "primaryRepo": "pytorch",
+      "repoCount": 1,
+      "skillCount": 13,
+      "catalogUrl": "https://www.skills.sh/pytorch"
+    },
+    {
+      "slug": "redis",
+      "primaryRepo": "agent-skills",
+      "repoCount": 2,
+      "skillCount": 6,
+      "catalogUrl": "https://www.skills.sh/redis"
+    },
+    {
+      "slug": "remotion-dev",
+      "primaryRepo": "skills",
+      "repoCount": 4,
+      "skillCount": 13,
+      "catalogUrl": "https://www.skills.sh/remotion-dev"
+    },
+    {
+      "slug": "resend",
+      "primaryRepo": "resend-skills",
+      "repoCount": 6,
+      "skillCount": 13,
+      "catalogUrl": "https://www.skills.sh/resend"
+    },
+    {
+      "slug": "rivet-dev",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 11,
+      "catalogUrl": "https://www.skills.sh/rivet-dev"
+    },
+    {
+      "slug": "runwayml",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 32,
+      "catalogUrl": "https://www.skills.sh/runwayml"
+    },
+    {
+      "slug": "sanity-io",
+      "primaryRepo": "agent-toolkit",
+      "repoCount": 6,
+      "skillCount": 48,
+      "catalogUrl": "https://www.skills.sh/sanity-io"
+    },
+    {
+      "slug": "semgrep",
+      "primaryRepo": "skills",
+      "repoCount": 3,
+      "skillCount": 6,
+      "catalogUrl": "https://www.skills.sh/semgrep"
+    },
+    {
+      "slug": "shopify",
+      "primaryRepo": "shopify-ai-toolkit",
+      "repoCount": 4,
+      "skillCount": 37,
+      "catalogUrl": "https://www.skills.sh/shopify"
+    },
+    {
+      "slug": "signoz",
+      "primaryRepo": "agent-skills",
+      "repoCount": 1,
+      "skillCount": 13,
+      "catalogUrl": "https://www.skills.sh/signoz"
+    },
+    {
+      "slug": "streamlit",
+      "primaryRepo": "agent-skills",
+      "repoCount": 2,
+      "skillCount": 38,
+      "catalogUrl": "https://www.skills.sh/streamlit"
+    },
+    {
+      "slug": "stripe",
+      "primaryRepo": "ai",
+      "repoCount": 5,
+      "skillCount": 11,
+      "catalogUrl": "https://www.skills.sh/stripe"
+    },
+    {
+      "slug": "supabase",
+      "primaryRepo": "agent-skills",
+      "repoCount": 3,
+      "skillCount": 16,
+      "catalogUrl": "https://www.skills.sh/supabase"
+    },
+    {
+      "slug": "sveltejs",
+      "primaryRepo": "ai-tools",
+      "repoCount": 2,
+      "skillCount": 3,
+      "catalogUrl": "https://www.skills.sh/sveltejs"
+    },
+    {
+      "slug": "tavily-ai",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 20,
+      "catalogUrl": "https://www.skills.sh/tavily-ai"
+    },
+    {
+      "slug": "temporalio",
+      "primaryRepo": "skill-temporal-developer",
+      "repoCount": 6,
+      "skillCount": 7,
+      "catalogUrl": "https://www.skills.sh/temporalio"
+    },
+    {
+      "slug": "tinybirdco",
+      "primaryRepo": "tinybird-agent-skills",
+      "repoCount": 1,
+      "skillCount": 4,
+      "catalogUrl": "https://www.skills.sh/tinybirdco"
+    },
+    {
+      "slug": "tldraw",
+      "primaryRepo": "tldraw",
+      "repoCount": 1,
+      "skillCount": 19,
+      "catalogUrl": "https://www.skills.sh/tldraw"
+    },
+    {
+      "slug": "triggerdotdev",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 13,
+      "catalogUrl": "https://www.skills.sh/triggerdotdev"
+    },
+    {
+      "slug": "upstash",
+      "primaryRepo": "context7",
+      "repoCount": 10,
+      "skillCount": 32,
+      "catalogUrl": "https://www.skills.sh/upstash"
+    },
+    {
+      "slug": "vercel",
+      "primaryRepo": "ai",
+      "repoCount": 23,
+      "skillCount": 127,
+      "catalogUrl": "https://www.skills.sh/vercel"
+    },
+    {
+      "slug": "vercel-labs",
+      "primaryRepo": "agent-skills",
+      "repoCount": 43,
+      "skillCount": 250,
+      "catalogUrl": "https://www.skills.sh/vercel-labs"
+    },
+    {
+      "slug": "webflow",
+      "primaryRepo": "webflow-skills",
+      "repoCount": 1,
+      "skillCount": 36,
+      "catalogUrl": "https://www.skills.sh/webflow"
+    },
+    {
+      "slug": "whopio",
+      "primaryRepo": "whop-payments-network-skill",
+      "repoCount": 1,
+      "skillCount": 1,
+      "catalogUrl": "https://www.skills.sh/whopio"
+    },
+    {
+      "slug": "wix",
+      "primaryRepo": "skills",
+      "repoCount": 2,
+      "skillCount": 23,
+      "catalogUrl": "https://www.skills.sh/wix"
+    },
+    {
+      "slug": "wordpress",
+      "primaryRepo": "agent-skills",
+      "repoCount": 2,
+      "skillCount": 16,
+      "catalogUrl": "https://www.skills.sh/wordpress"
+    }
+  ]
+}
