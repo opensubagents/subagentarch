@@ -1,0 +1,321 @@
+# subagent architecture — GraphQL schema
+#
+# This is the source-of-truth entity-relationship-diagram for the opensubagents
+# ecosystem, expressed as a GraphQL schema. Every HTML architecture document
+# in docs/ is generated against this file, so the docs cannot drift from the
+# data model.
+#
+# Entities here come from three places:
+#   1. subagenttasks         Zod-derived task data model (this org)
+#   2. claude-managed-agents  primitives published at platform.claude.com
+#   3. subagentbriefs         brief/plan/initiative shape (this org)
+#
+# Relationships are typed: a field of type Foo means "points at one Foo",
+# [Foo!]! means "points at many Foos and the list is non-null".
+#
+# No runtime. No resolvers. Just the shape.
+
+# ============================================================================
+# ENUMS — verbatim from subagenttasks/schemas/tasks.schema.json
+# ============================================================================
+
+enum TaskStatus {
+  pending
+  in_progress      # serialized as "in-progress" in JSON
+  blocked
+  done
+  cancelled
+  deferred
+}
+
+enum SubtaskStatus {
+  pending
+  done
+  completed
+}
+
+enum Priority {
+  low
+  medium
+  high
+  critical
+}
+
+enum BriefStatus {
+  draft
+  reviewed
+  approved
+  superseded
+  archived
+}
+
+enum SessionState {
+  queued
+  running
+  paused
+  completed
+  failed
+  cancelled
+}
+
+enum PermissionDecision {
+  allow
+  deny
+  prompt
+}
+
+# ============================================================================
+# TASK MODEL — from subagenttasks v0.1.0
+# ============================================================================
+
+"""A named keyspace grouping tasks. The active tag is operator-chosen."""
+type Tag {
+  name: ID!
+  tasks: [Task!]!
+  metadata: JSON
+}
+
+"""A single unit of work."""
+type Task {
+  id: Int!
+  title: String!
+  description: String!
+  status: TaskStatus!
+  previousStatus: TaskStatus
+  dependencies: [Dependency!]!
+  priority: Priority
+  details: String
+  testStrategy: String
+  subtasks: [Subtask!]!
+  metadata: JSON
+
+  # Relationships
+  tag: Tag!
+  brief: Brief
+  session: Session
+}
+
+"""A child of a Task, with a stricter shape."""
+type Subtask {
+  id: Int!
+  title: String!
+  description: String!
+  status: SubtaskStatus!
+  dependencies: [Int!]!
+  details: String!
+  testStrategy: String
+  parent: Task!
+}
+
+"""Either an integer task id, or a dotted-path string like "3.2"."""
+union Dependency = TaskRef | SubtaskRef
+type TaskRef    { taskId: Int! }
+type SubtaskRef { taskId: Int!, subtaskId: Int! }
+
+"""Output of an analyze-complexity run, used to drive subtask expansion."""
+type ComplexityReport {
+  items: [ComplexityAnalysisItem!]!
+}
+type ComplexityAnalysisItem {
+  task: Task!
+  taskTitle: String!
+  complexityScore: Int!         # 1..10
+  recommendedSubtasks: Int!
+  expansionPrompt: String
+  reasoning: String!
+}
+
+# ============================================================================
+# BRIEF MODEL — from subagentbriefs (canonical, not from any vendor)
+# ============================================================================
+
+"""A document that frames a piece of work before it is decomposed into tasks."""
+type Brief {
+  id: ID!
+  title: String!
+  status: BriefStatus!
+  summary: String!
+  body: String!                  # markdown
+  initiatives: [Initiative!]!
+  tasks: [Task!]!                # tasks emitted from this brief
+  links: [Link!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A higher-level grouping of briefs, owned by a person or team."""
+type Initiative {
+  id: ID!
+  title: String!
+  description: String!
+  briefs: [Brief!]!
+  owner: String
+}
+
+type Link {
+  rel: String!     # e.g. "issue", "pr", "doc", "session"
+  href: String!
+  title: String
+}
+
+# ============================================================================
+# MANAGED-AGENTS PRIMITIVES — from platform.claude.com/managed-agents/*
+# Names verbatim from the docs the operator shared.
+# ============================================================================
+
+"""A configured agent definition. Pre-existing at session start."""
+type Agent {
+  id: ID!
+  name: String!
+  systemPrompt: String!
+  tools: [Tool!]!
+  skills: [Skill!]!
+  permissionPolicy: PermissionPolicy!
+  environment: Environment!
+  memoryStores: [MemoryStore!]!
+  vaults: [Vault!]!
+  webhooks: [Webhook!]!
+}
+
+"""A single run of one or more agents working toward outcomes."""
+type Session {
+  id: ID!
+  state: SessionState!
+  agents: [Agent!]!            # multi-agent sessions list >1
+  outcomes: [Outcome!]!
+  events: [SessionEvent!]!     # stream
+  files: [SessionFile!]!
+  startedAt: DateTime!
+  endedAt: DateTime
+}
+
+"""A measurable end-state the session is trying to reach."""
+type Outcome {
+  id: ID!
+  description: String!
+  passed: Boolean
+  evidence: String             # path or URL the agent points to
+}
+
+"""One event in the session event stream."""
+type SessionEvent {
+  ts: DateTime!
+  kind: String!                # tool_call | tool_result | message | hook | ...
+  payload: JSON!
+  session: Session!
+}
+
+"""Where a session runs. Cloud or self-hosted sandbox."""
+type Environment {
+  id: ID!
+  kind: EnvironmentKind!
+  containerRef: String         # cloud-containers ref or self-hosted endpoint
+  egressAllowlist: [String!]!
+}
+enum EnvironmentKind { cloud_container, self_hosted_sandbox }
+
+"""Tool the agent can invoke during a session."""
+type Tool {
+  name: String!
+  description: String!
+  inputSchema: JSON!
+  outputSchema: JSON
+  provider: ToolProvider!
+}
+enum ToolProvider { built_in, mcp_connector, mcp_tunnel, custom }
+
+"""Reusable instructions + assets, loaded into the agent context on demand."""
+type Skill {
+  id: ID!
+  name: String!
+  description: String!         # the triggering description
+  files: [SkillFile!]!
+}
+type SkillFile { path: String!, sha: String! }
+
+"""Secret material the agent can authenticate with, never reveals."""
+type Vault {
+  id: ID!
+  name: String!
+  secretNames: [String!]!      # values are never returned by the API
+}
+
+"""Per-tool / per-path allow/deny configuration."""
+type PermissionPolicy {
+  id: ID!
+  rules: [PermissionRule!]!
+}
+type PermissionRule {
+  toolPattern: String!         # e.g. "Bash(git push:*)"
+  decision: PermissionDecision!
+  reason: String
+}
+
+"""Durable cross-session memory the agent reads/writes."""
+type MemoryStore {
+  id: ID!
+  name: String!
+  entries: [MemoryEntry!]!
+}
+type MemoryEntry { key: String!, value: JSON!, updatedAt: DateTime! }
+
+"""A speculative plan the agent can elaborate before committing to action."""
+type Dream {
+  id: ID!
+  session: Session!
+  prompt: String!
+  steps: [DreamStep!]!
+}
+type DreamStep { description: String!, predictedTools: [String!]! }
+
+"""Webhook subscription that fires on session events."""
+type Webhook {
+  id: ID!
+  url: String!
+  secret: String!              # HMAC signing key (never returned)
+  events: [String!]!           # subscribed event kinds
+}
+
+"""File attached to or downloadable from a session."""
+type SessionFile {
+  id: ID!
+  name: String!
+  mimeType: String!
+  sizeBytes: Int!
+  session: Session!
+}
+
+# ============================================================================
+# CROSS-CUTTING — observability + feature flags (the planned G4 packages)
+# ============================================================================
+
+"""OpenFeature flag definition. Backed by Cloudflare KV in subagentflags."""
+type FeatureFlag {
+  key: ID!
+  variants: [FlagVariant!]!
+  defaultVariant: String!
+  targeting: JSON              # OpenFeature targeting rules
+}
+type FlagVariant { name: String!, value: JSON! }
+
+"""OpenTelemetry span emitted by a session, gen_ai.* semconv attrs."""
+type Trace {
+  traceId: ID!
+  session: Session!
+  spans: [Span!]!
+}
+type Span {
+  spanId: ID!
+  parentSpanId: ID
+  name: String!
+  startTs: DateTime!
+  endTs: DateTime!
+  attributes: JSON!            # includes gen_ai.system, gen_ai.request.model, etc.
+}
+
+# ============================================================================
+# SCALARS
+# ============================================================================
+
+scalar DateTime  # ISO-8601 UTC
+scalar JSON

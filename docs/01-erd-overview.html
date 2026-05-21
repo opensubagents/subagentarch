@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>opensubagents architecture — entity-relationship diagram</title>
+<style>
+  :root {
+    --ivory:   #FAF9F5;
+    --slate:   #141413;
+    --clay:    #D97757;
+    --oat:     #E3DACC;
+    --olive:   #788C5D;
+    --rust:    #B04A3F;
+    --indigo:  #4F5D8A;
+    --gray-150:#F0EEE6;
+    --gray-300:#D1CFC5;
+    --gray-500:#87867F;
+    --gray-700:#3D3D3A;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--ivory);
+    color: var(--slate);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 24px 96px;
+  }
+  .sheet { max-width: 1200px; margin: 0 auto; }
+
+  header { margin-bottom: 40px; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 34px;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+  .lead {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--gray-700);
+    max-width: 720px;
+  }
+  .lead code { font-family: var(--mono); font-size: 13px; background: var(--gray-150); padding: 1px 5px; border-radius: 3px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 32px;
+    align-items: start;
+    margin-top: 32px;
+  }
+  @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+
+  .canvas {
+    border: 1.5px solid var(--gray-300);
+    border-radius: 14px;
+    background: #fff;
+    padding: 24px;
+    overflow-x: auto;
+  }
+  svg.erd { display: block; width: 100%; height: auto; }
+
+  .erd text {
+    font-family: var(--mono);
+    font-size: 11px;
+    fill: var(--slate);
+    pointer-events: none;
+  }
+  .erd .title { font-size: 12px; font-weight: 600; }
+  .erd .field { font-size: 10px; fill: var(--gray-700); }
+  .erd .scalar { font-size: 9.5px; fill: var(--gray-500); }
+  .erd .enum-val { font-size: 9.5px; fill: var(--olive); }
+  .erd .pkg { font-size: 9px; fill: var(--gray-500); letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .entity rect {
+    fill: #fff;
+    stroke: var(--gray-300);
+    stroke-width: 1.5;
+    rx: 8;
+    transition: stroke 120ms ease;
+  }
+  .entity.task    rect { fill: rgba(217,119,87,0.04); stroke: var(--clay); }
+  .entity.brief   rect { fill: rgba(120,140,93,0.05); stroke: var(--olive); }
+  .entity.session rect { fill: rgba(79,93,138,0.05); stroke: var(--indigo); }
+  .entity.config  rect { fill: var(--gray-150); }
+  .entity.enum    rect { fill: #fff; stroke-dasharray: 3 3; }
+  .entity.cross   rect { fill: rgba(176,74,63,0.04); stroke: var(--rust); }
+
+  .entity { cursor: pointer; }
+  .entity:hover rect { stroke-width: 2.5; }
+  .entity.active rect { stroke-width: 2.5; stroke: var(--clay); }
+  .entity.dimmed { opacity: 0.22; }
+
+  .header-bar { fill: var(--gray-150); }
+  .entity.task    .header-bar { fill: rgba(217,119,87,0.16); }
+  .entity.brief   .header-bar { fill: rgba(120,140,93,0.16); }
+  .entity.session .header-bar { fill: rgba(79,93,138,0.18); }
+  .entity.cross   .header-bar { fill: rgba(176,74,63,0.14); }
+  .entity.enum    .header-bar { fill: var(--gray-150); }
+
+  .edge {
+    fill: none;
+    stroke: var(--gray-500);
+    stroke-width: 1.2;
+    marker-end: url(#arrow);
+    transition: stroke 120ms ease, opacity 120ms ease;
+  }
+  .edge.many { stroke-dasharray: 5 3; }
+  .edge.dimmed { opacity: 0.15; }
+  .edge.active { stroke: var(--clay); stroke-width: 2; }
+
+  .edge-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    fill: var(--gray-500);
+    pointer-events: none;
+  }
+
+  /* side panel */
+  aside {
+    position: sticky;
+    top: 24px;
+    background: #fff;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--gray-700);
+  }
+  aside h3 { font-family: var(--serif); font-weight: 500; font-size: 17px; color: var(--slate); margin-bottom: 12px; }
+  aside .empty { color: var(--gray-500); font-style: italic; }
+  aside .meta { font-family: var(--mono); font-size: 10.5px; color: var(--gray-500); margin-bottom: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+  aside h4 { font-size: 12px; font-family: var(--mono); color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 14px; margin-bottom: 6px; }
+  aside ul { list-style: none; padding: 0; }
+  aside li { padding: 3px 0; font-family: var(--mono); font-size: 11.5px; color: var(--slate); }
+  aside li .ftype { color: var(--gray-500); }
+  aside .reset {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--clay);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: var(--clay);
+    text-underline-offset: 3px;
+  }
+  aside .reset:hover { color: var(--rust); }
+
+  /* legend */
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+    padding: 18px;
+    border: 1px solid var(--gray-300);
+    border-radius: 10px;
+    background: #fff;
+  }
+  .legend .item { display: flex; align-items: center; gap: 10px; font-size: 12px; font-family: var(--mono); color: var(--gray-700); }
+  .legend .swatch { width: 22px; height: 14px; border-radius: 3px; border: 1.5px solid; flex-shrink: 0; }
+
+  /* footer notes */
+  .footnote {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gray-300);
+    font-size: 12.5px;
+    color: var(--gray-500);
+    font-family: var(--mono);
+    line-height: 1.7;
+  }
+  .footnote a { color: var(--gray-700); }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <div class="eyebrow">opensubagents · architecture · 2026-05-21</div>
+    <h1>Entity-relationship diagram</h1>
+    <p class="lead">
+      The shape of every entity our agents reason about, expressed once.
+      The Zod schemas in <code>subagenttasks</code> are the canonical data model;
+      the managed-agents primitives (<code>Session</code>, <code>Environment</code>,
+      <code>Vault</code>, <code>Dream</code>, <code>MemoryStore</code>) are the runtime they live in.
+      Click any entity to highlight only its direct relationships.
+    </p>
+  </header>
+
+  <div class="layout">
+    <div class="canvas">
+      <svg class="erd" viewBox="0 0 1100 1320" xmlns="http://www.w3.org/2000/svg">
+
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="#87867F"/>
+          </marker>
+        </defs>
+
+        <!-- ============ TASK CLUSTER (subagenttasks) ============ -->
+        <!-- Tag -->
+        <g class="entity task" data-id="Tag" transform="translate(40, 60)">
+          <rect width="220" height="76"/>
+          <rect class="header-bar" width="220" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="220" height="8"/>
+          <text class="title" x="14" y="16">Tag</text>
+          <text class="pkg" x="14" y="36">subagenttasks</text>
+          <text class="field" x="14" y="52">name: <tspan class="scalar">ID!</tspan></text>
+          <text class="field" x="14" y="66">tasks: <tspan class="scalar">[Task!]!</tspan></text>
+        </g>
+
+        <!-- Task -->
+        <g class="entity task" data-id="Task" transform="translate(330, 60)">
+          <rect width="260" height="200"/>
+          <rect class="header-bar" width="260" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="260" height="8"/>
+          <text class="title" x="14" y="16">Task</text>
+          <text class="pkg" x="14" y="36">subagenttasks</text>
+          <text class="field" x="14" y="52">id: <tspan class="scalar">Int!</tspan></text>
+          <text class="field" x="14" y="66">title: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">status: <tspan class="scalar">TaskStatus!</tspan></text>
+          <text class="field" x="14" y="94">previousStatus: <tspan class="scalar">TaskStatus</tspan></text>
+          <text class="field" x="14" y="108">dependencies: <tspan class="scalar">[Dependency!]!</tspan></text>
+          <text class="field" x="14" y="122">priority: <tspan class="scalar">Priority</tspan></text>
+          <text class="field" x="14" y="136">details: <tspan class="scalar">String</tspan></text>
+          <text class="field" x="14" y="150">testStrategy: <tspan class="scalar">String</tspan></text>
+          <text class="field" x="14" y="164">subtasks: <tspan class="scalar">[Subtask!]!</tspan></text>
+          <text class="field" x="14" y="178">tag: <tspan class="scalar">Tag!</tspan></text>
+          <text class="field" x="14" y="192">brief: <tspan class="scalar">Brief</tspan></text>
+        </g>
+
+        <!-- Subtask -->
+        <g class="entity task" data-id="Subtask" transform="translate(660, 60)">
+          <rect width="220" height="130"/>
+          <rect class="header-bar" width="220" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="220" height="8"/>
+          <text class="title" x="14" y="16">Subtask</text>
+          <text class="pkg" x="14" y="36">subagenttasks</text>
+          <text class="field" x="14" y="52">id: <tspan class="scalar">Int!</tspan></text>
+          <text class="field" x="14" y="66">title: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">status: <tspan class="scalar">SubtaskStatus!</tspan></text>
+          <text class="field" x="14" y="94">dependencies: <tspan class="scalar">[Int!]!</tspan></text>
+          <text class="field" x="14" y="108">details: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="122">parent: <tspan class="scalar">Task!</tspan></text>
+        </g>
+
+        <!-- ComplexityReport -->
+        <g class="entity task" data-id="ComplexityReport" transform="translate(950, 60)">
+          <rect width="120" height="60"/>
+          <rect class="header-bar" width="120" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="120" height="8"/>
+          <text class="title" x="14" y="16">Complexity</text>
+          <text class="title" x="14" y="30">Report</text>
+          <text class="pkg" x="14" y="46">subagenttasks</text>
+        </g>
+
+        <!-- ============ ENUMS (rendered as dashed boxes) ============ -->
+        <g class="entity enum" data-id="TaskStatus" transform="translate(330, 290)">
+          <rect width="170" height="100"/>
+          <rect class="header-bar" width="170" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="170" height="8"/>
+          <text class="title" x="14" y="16">TaskStatus</text>
+          <text class="pkg" x="14" y="36">enum</text>
+          <text class="enum-val" x="14" y="52">pending</text>
+          <text class="enum-val" x="80" y="52">in-progress</text>
+          <text class="enum-val" x="14" y="66">blocked</text>
+          <text class="enum-val" x="80" y="66">done</text>
+          <text class="enum-val" x="14" y="80">cancelled</text>
+          <text class="enum-val" x="80" y="80">deferred</text>
+        </g>
+
+        <g class="entity enum" data-id="SubtaskStatus" transform="translate(660, 290)">
+          <rect width="160" height="74"/>
+          <rect class="header-bar" width="160" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="160" height="8"/>
+          <text class="title" x="14" y="16">SubtaskStatus</text>
+          <text class="pkg" x="14" y="36">enum</text>
+          <text class="enum-val" x="14" y="52">pending</text>
+          <text class="enum-val" x="64" y="52">done</text>
+          <text class="enum-val" x="14" y="66">completed</text>
+        </g>
+
+        <g class="entity enum" data-id="Priority" transform="translate(950, 150)">
+          <rect width="120" height="88"/>
+          <rect class="header-bar" width="120" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="120" height="8"/>
+          <text class="title" x="14" y="16">Priority</text>
+          <text class="pkg" x="14" y="36">enum · nullable</text>
+          <text class="enum-val" x="14" y="52">low</text>
+          <text class="enum-val" x="14" y="66">medium</text>
+          <text class="enum-val" x="64" y="52">high</text>
+          <text class="enum-val" x="64" y="66">critical</text>
+          <text class="enum-val" x="14" y="80">null</text>
+        </g>
+
+        <!-- ============ BRIEF CLUSTER (subagentbriefs) ============ -->
+        <g class="entity brief" data-id="Initiative" transform="translate(40, 460)">
+          <rect width="200" height="84"/>
+          <rect class="header-bar" width="200" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="200" height="8"/>
+          <text class="title" x="14" y="16">Initiative</text>
+          <text class="pkg" x="14" y="36">subagentbriefs</text>
+          <text class="field" x="14" y="52">id: <tspan class="scalar">ID!</tspan></text>
+          <text class="field" x="14" y="66">title: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">briefs: <tspan class="scalar">[Brief!]!</tspan></text>
+        </g>
+
+        <g class="entity brief" data-id="Brief" transform="translate(290, 460)">
+          <rect width="240" height="140"/>
+          <rect class="header-bar" width="240" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="240" height="8"/>
+          <text class="title" x="14" y="16">Brief</text>
+          <text class="pkg" x="14" y="36">subagentbriefs</text>
+          <text class="field" x="14" y="52">id: <tspan class="scalar">ID!</tspan></text>
+          <text class="field" x="14" y="66">title: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">status: <tspan class="scalar">BriefStatus!</tspan></text>
+          <text class="field" x="14" y="94">summary: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="108">body: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="122">tasks: <tspan class="scalar">[Task!]!</tspan></text>
+          <text class="field" x="14" y="136">links: <tspan class="scalar">[Link!]!</tspan></text>
+        </g>
+
+        <g class="entity enum" data-id="BriefStatus" transform="translate(580, 460)">
+          <rect width="160" height="100"/>
+          <rect class="header-bar" width="160" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="160" height="8"/>
+          <text class="title" x="14" y="16">BriefStatus</text>
+          <text class="pkg" x="14" y="36">enum</text>
+          <text class="enum-val" x="14" y="52">draft</text>
+          <text class="enum-val" x="14" y="66">reviewed</text>
+          <text class="enum-val" x="14" y="80">approved</text>
+          <text class="enum-val" x="80" y="52">superseded</text>
+          <text class="enum-val" x="80" y="66">archived</text>
+        </g>
+
+        <!-- ============ MANAGED-AGENTS CLUSTER ============ -->
+        <g class="entity session" data-id="Agent" transform="translate(40, 700)">
+          <rect width="220" height="170"/>
+          <rect class="header-bar" width="220" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="220" height="8"/>
+          <text class="title" x="14" y="16">Agent</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">id: <tspan class="scalar">ID!</tspan></text>
+          <text class="field" x="14" y="66">name: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">tools: <tspan class="scalar">[Tool!]!</tspan></text>
+          <text class="field" x="14" y="94">skills: <tspan class="scalar">[Skill!]!</tspan></text>
+          <text class="field" x="14" y="108">environment: <tspan class="scalar">Environment!</tspan></text>
+          <text class="field" x="14" y="122">vaults: <tspan class="scalar">[Vault!]!</tspan></text>
+          <text class="field" x="14" y="136">memoryStores: <tspan class="scalar">[MemoryStore!]!</tspan></text>
+          <text class="field" x="14" y="150">permissionPolicy: <tspan class="scalar">Policy!</tspan></text>
+          <text class="field" x="14" y="164">webhooks: <tspan class="scalar">[Webhook!]!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Session" transform="translate(310, 700)">
+          <rect width="220" height="158"/>
+          <rect class="header-bar" width="220" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="220" height="8"/>
+          <text class="title" x="14" y="16">Session</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">id: <tspan class="scalar">ID!</tspan></text>
+          <text class="field" x="14" y="66">state: <tspan class="scalar">SessionState!</tspan></text>
+          <text class="field" x="14" y="80">agents: <tspan class="scalar">[Agent!]!</tspan></text>
+          <text class="field" x="14" y="94">outcomes: <tspan class="scalar">[Outcome!]!</tspan></text>
+          <text class="field" x="14" y="108">events: <tspan class="scalar">[SessionEvent!]!</tspan></text>
+          <text class="field" x="14" y="122">files: <tspan class="scalar">[SessionFile!]!</tspan></text>
+          <text class="field" x="14" y="136">startedAt: <tspan class="scalar">DateTime!</tspan></text>
+          <text class="field" x="14" y="150">endedAt: <tspan class="scalar">DateTime</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Outcome" transform="translate(580, 700)">
+          <rect width="170" height="84"/>
+          <rect class="header-bar" width="170" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="170" height="8"/>
+          <text class="title" x="14" y="16">Outcome</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">description: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="66">passed: <tspan class="scalar">Boolean</tspan></text>
+          <text class="field" x="14" y="80">evidence: <tspan class="scalar">String</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Environment" transform="translate(790, 700)">
+          <rect width="180" height="84"/>
+          <rect class="header-bar" width="180" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="180" height="8"/>
+          <text class="title" x="14" y="16">Environment</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">kind: <tspan class="scalar">EnvironmentKind!</tspan></text>
+          <text class="field" x="14" y="66">containerRef: <tspan class="scalar">String</tspan></text>
+          <text class="field" x="14" y="80">egressAllowlist: <tspan class="scalar">[String!]!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Tool" transform="translate(40, 920)">
+          <rect width="160" height="84"/>
+          <rect class="header-bar" width="160" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="160" height="8"/>
+          <text class="title" x="14" y="16">Tool</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">name: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="66">inputSchema: <tspan class="scalar">JSON!</tspan></text>
+          <text class="field" x="14" y="80">provider: <tspan class="scalar">ToolProvider!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Skill" transform="translate(220, 920)">
+          <rect width="150" height="84"/>
+          <rect class="header-bar" width="150" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="150" height="8"/>
+          <text class="title" x="14" y="16">Skill</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">name: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="66">description: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">files: <tspan class="scalar">[SkillFile!]!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Vault" transform="translate(390, 920)">
+          <rect width="160" height="84"/>
+          <rect class="header-bar" width="160" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="160" height="8"/>
+          <text class="title" x="14" y="16">Vault</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">name: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="66">secretNames: <tspan class="scalar">[String!]!</tspan></text>
+          <text class="field" x="14" y="80" style="fill:var(--gray-500)">values never returned</text>
+        </g>
+
+        <g class="entity session" data-id="MemoryStore" transform="translate(570, 920)">
+          <rect width="180" height="84"/>
+          <rect class="header-bar" width="180" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="180" height="8"/>
+          <text class="title" x="14" y="16">MemoryStore</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">name: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="66">entries: <tspan class="scalar">[MemoryEntry!]!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="PermissionPolicy" transform="translate(770, 920)">
+          <rect width="200" height="84"/>
+          <rect class="header-bar" width="200" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="200" height="8"/>
+          <text class="title" x="14" y="16">PermissionPolicy</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">rules: <tspan class="scalar">[PermRule!]!</tspan></text>
+          <text class="field" x="14" y="66">decision: <tspan class="scalar">allow/deny/prompt</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Dream" transform="translate(40, 1060)">
+          <rect width="170" height="84"/>
+          <rect class="header-bar" width="170" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="170" height="8"/>
+          <text class="title" x="14" y="16">Dream</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">session: <tspan class="scalar">Session!</tspan></text>
+          <text class="field" x="14" y="66">prompt: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">steps: <tspan class="scalar">[DreamStep!]!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="Webhook" transform="translate(230, 1060)">
+          <rect width="170" height="84"/>
+          <rect class="header-bar" width="170" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="170" height="8"/>
+          <text class="title" x="14" y="16">Webhook</text>
+          <text class="pkg" x="14" y="36">managed-agents</text>
+          <text class="field" x="14" y="52">url: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="66">events: <tspan class="scalar">[String!]!</tspan></text>
+          <text class="field" x="14" y="80">secret: <tspan class="scalar">String!</tspan></text>
+        </g>
+
+        <g class="entity session" data-id="SessionEvent" transform="translate(420, 1060)">
+          <rect width="180" height="84"/>
+          <rect class="header-bar" width="180" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="180" height="8"/>
+          <text class="title" x="14" y="16">SessionEvent</text>
+          <text class="pkg" x="14" y="36">managed-agents · stream</text>
+          <text class="field" x="14" y="52">ts: <tspan class="scalar">DateTime!</tspan></text>
+          <text class="field" x="14" y="66">kind: <tspan class="scalar">String!</tspan></text>
+          <text class="field" x="14" y="80">payload: <tspan class="scalar">JSON!</tspan></text>
+        </g>
+
+        <!-- ============ CROSS-CUTTING ============ -->
+        <g class="entity cross" data-id="FeatureFlag" transform="translate(620, 1060)">
+          <rect width="180" height="84"/>
+          <rect class="header-bar" width="180" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="180" height="8"/>
+          <text class="title" x="14" y="16">FeatureFlag</text>
+          <text class="pkg" x="14" y="36">subagentflags · planned</text>
+          <text class="field" x="14" y="52">key: <tspan class="scalar">ID!</tspan></text>
+          <text class="field" x="14" y="66">variants: <tspan class="scalar">[Variant!]!</tspan></text>
+          <text class="field" x="14" y="80">backend: <tspan class="scalar">CF KV</tspan></text>
+        </g>
+
+        <g class="entity cross" data-id="Trace" transform="translate(820, 1060)">
+          <rect width="200" height="84"/>
+          <rect class="header-bar" width="200" height="22" rx="8"/>
+          <rect class="header-bar" y="14" width="200" height="8"/>
+          <text class="title" x="14" y="16">Trace · Span</text>
+          <text class="pkg" x="14" y="36">subagentobs · planned</text>
+          <text class="field" x="14" y="52">attrs: <tspan class="scalar">gen_ai.*</tspan></text>
+          <text class="field" x="14" y="66">sink: <tspan class="scalar">CF Analytics</tspan></text>
+          <text class="field" x="14" y="80">spec: <tspan class="scalar">OpenTelemetry</tspan></text>
+        </g>
+
+        <!-- ============ EDGES ============ -->
+        <!-- Tag → Task -->
+        <path class="edge many" data-from="Tag" data-to="Task" d="M 260,98 Q 295,98 330,98"/>
+        <text class="edge-label" x="270" y="92">[Task]</text>
+        <!-- Task → Subtask -->
+        <path class="edge many" data-from="Task" data-to="Subtask" d="M 590,150 Q 625,150 660,150"/>
+        <text class="edge-label" x="600" y="144">[Subtask]</text>
+        <!-- Task → TaskStatus -->
+        <path class="edge" data-from="Task" data-to="TaskStatus" d="M 415,260 L 415,290"/>
+        <text class="edge-label" x="420" y="278">status</text>
+        <!-- Subtask → SubtaskStatus -->
+        <path class="edge" data-from="Subtask" data-to="SubtaskStatus" d="M 740,190 L 740,290"/>
+        <text class="edge-label" x="746" y="240">status</text>
+        <!-- Task → Priority -->
+        <path class="edge" data-from="Task" data-to="Priority" d="M 590,180 Q 770,180 950,180"/>
+        <text class="edge-label" x="760" y="174">priority</text>
+        <!-- Task → ComplexityReport (via analyze) -->
+        <path class="edge many" data-from="Task" data-to="ComplexityReport" d="M 590,80 Q 770,80 950,90"/>
+        <text class="edge-label" x="760" y="74">items[].task</text>
+
+        <!-- Brief → Task -->
+        <path class="edge many" data-from="Brief" data-to="Task" d="M 410,460 Q 450,360 460,260"/>
+        <text class="edge-label" x="430" y="380">tasks[]</text>
+        <!-- Initiative → Brief -->
+        <path class="edge many" data-from="Initiative" data-to="Brief" d="M 240,500 Q 265,500 290,500"/>
+        <text class="edge-label" x="248" y="494">briefs[]</text>
+        <!-- Brief → BriefStatus -->
+        <path class="edge" data-from="Brief" data-to="BriefStatus" d="M 530,510 Q 555,510 580,510"/>
+        <text class="edge-label" x="538" y="504">status</text>
+        <!-- Brief → Session (work emitted) -->
+        <path class="edge" data-from="Brief" data-to="Session" d="M 410,600 Q 380,650 380,700"/>
+        <text class="edge-label" x="384" y="650">runs in</text>
+
+        <!-- Session → Agent -->
+        <path class="edge many" data-from="Session" data-to="Agent" d="M 310,780 Q 285,780 260,780"/>
+        <text class="edge-label" x="265" y="774">[Agent]</text>
+        <!-- Session → Outcome -->
+        <path class="edge many" data-from="Session" data-to="Outcome" d="M 530,745 Q 555,745 580,745"/>
+        <text class="edge-label" x="538" y="739">[Outcome]</text>
+        <!-- Session → Environment via Agent -->
+        <path class="edge" data-from="Agent" data-to="Environment" d="M 260,790 Q 525,790 790,740"/>
+        <text class="edge-label" x="540" y="784">environment</text>
+        <!-- Agent → Tool -->
+        <path class="edge many" data-from="Agent" data-to="Tool" d="M 130,870 L 130,920"/>
+        <text class="edge-label" x="134" y="900">[Tool]</text>
+        <!-- Agent → Skill -->
+        <path class="edge many" data-from="Agent" data-to="Skill" d="M 175,870 Q 230,890 280,920"/>
+        <text class="edge-label" x="220" y="900">[Skill]</text>
+        <!-- Agent → Vault -->
+        <path class="edge many" data-from="Agent" data-to="Vault" d="M 220,870 Q 360,890 450,920"/>
+        <text class="edge-label" x="345" y="900">[Vault]</text>
+        <!-- Agent → MemoryStore -->
+        <path class="edge many" data-from="Agent" data-to="MemoryStore" d="M 245,870 Q 480,890 640,920"/>
+        <text class="edge-label" x="490" y="900">[MemoryStore]</text>
+        <!-- Agent → PermissionPolicy -->
+        <path class="edge" data-from="Agent" data-to="PermissionPolicy" d="M 260,820 Q 540,820 820,920"/>
+        <text class="edge-label" x="550" y="900">permissionPolicy</text>
+        <!-- Agent → Webhook -->
+        <path class="edge many" data-from="Agent" data-to="Webhook" d="M 130,870 Q 200,990 310,1060"/>
+        <text class="edge-label" x="200" y="1000">[Webhook]</text>
+        <!-- Session → SessionEvent -->
+        <path class="edge many" data-from="Session" data-to="SessionEvent" d="M 420,858 Q 460,940 505,1060"/>
+        <text class="edge-label" x="455" y="980">[events]</text>
+        <!-- Session → Dream -->
+        <path class="edge many" data-from="Session" data-to="Dream" d="M 310,830 Q 200,930 130,1060"/>
+        <text class="edge-label" x="190" y="980">[Dream]</text>
+        <!-- Trace → Session -->
+        <path class="edge" data-from="Trace" data-to="Session" d="M 920,1060 Q 720,930 530,860"/>
+        <text class="edge-label" x="700" y="950">traces</text>
+
+      </svg>
+    </div>
+
+    <aside id="panel">
+      <div class="meta">click an entity</div>
+      <h3>About this diagram</h3>
+      <p>Every entity here exists somewhere in the org. Click any box to see what it points at and what points back at it. Click empty space to reset.</p>
+      <h4>Packages</h4>
+      <ul>
+        <li><span style="color:var(--clay)">●</span> <span class="ftype">subagenttasks</span></li>
+        <li><span style="color:var(--olive)">●</span> <span class="ftype">subagentbriefs</span></li>
+        <li><span style="color:var(--indigo)">●</span> <span class="ftype">managed-agents</span></li>
+        <li><span style="color:var(--rust)">●</span> <span class="ftype">flags / obs (planned)</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch" style="background:rgba(217,119,87,0.16); border-color:var(--clay)"></span> Task entities (subagenttasks)</div>
+    <div class="item"><span class="swatch" style="background:rgba(120,140,93,0.16); border-color:var(--olive)"></span> Brief entities (subagentbriefs)</div>
+    <div class="item"><span class="swatch" style="background:rgba(79,93,138,0.18); border-color:var(--indigo)"></span> Managed-agents primitives</div>
+    <div class="item"><span class="swatch" style="background:rgba(176,74,63,0.14); border-color:var(--rust)"></span> Cross-cutting (planned)</div>
+    <div class="item"><span class="swatch" style="background:#fff; border-color:var(--gray-500); border-style:dashed"></span> Enums</div>
+    <div class="item"><span class="swatch" style="background:transparent; border:none; border-top:1.5px dashed var(--gray-500); border-radius:0; height:1px;"></span> Many (list)</div>
+  </div>
+
+  <div class="footnote">
+    <strong>Source of truth:</strong> <code>schema/architecture.graphql</code> in the same repo.<br>
+    <strong>Generated from:</strong> Zod schemas at <code>opensubagents/subagenttasks/types/tasks.types.ts</code> and the managed-agents primitives at <code>platform.claude.com/docs/en/managed-agents/*</code>.<br>
+    <strong>Format:</strong> follows the html-effectiveness pattern at <code>opensubagents/subagenthtml</code>.
+  </div>
+
+</div>
+
+<script>
+  // Build adjacency from the rendered edges so the JS stays in sync with the SVG.
+  const edges = Array.from(document.querySelectorAll('.edge'));
+  const adj = {};
+  edges.forEach(e => {
+    const f = e.dataset.from, t = e.dataset.to;
+    if (!f || !t) return;
+    (adj[f] = adj[f] || new Set()).add(t);
+    (adj[t] = adj[t] || new Set()).add(f);
+  });
+
+  const entities = Array.from(document.querySelectorAll('.entity'));
+  const panel = document.getElementById('panel');
+
+  function reset() {
+    entities.forEach(n => { n.classList.remove('active','dimmed'); });
+    edges.forEach(e => e.classList.remove('active','dimmed'));
+    panel.innerHTML = `
+      <div class="meta">click an entity</div>
+      <h3>About this diagram</h3>
+      <p>Every entity here exists somewhere in the org. Click any box to see what it points at and what points back at it. Click empty space to reset.</p>
+      <h4>Packages</h4>
+      <ul>
+        <li><span style="color:var(--clay)">●</span> <span class="ftype">subagenttasks</span></li>
+        <li><span style="color:var(--olive)">●</span> <span class="ftype">subagentbriefs</span></li>
+        <li><span style="color:var(--indigo)">●</span> <span class="ftype">managed-agents</span></li>
+        <li><span style="color:var(--rust)">●</span> <span class="ftype">flags / obs (planned)</span></li>
+      </ul>
+    `;
+  }
+
+  function focus(id) {
+    const neighbors = adj[id] || new Set();
+    entities.forEach(n => {
+      const nid = n.dataset.id;
+      if (nid === id) n.classList.add('active');
+      else if (neighbors.has(nid)) { n.classList.remove('dimmed'); n.classList.remove('active'); }
+      else { n.classList.add('dimmed'); n.classList.remove('active'); }
+    });
+    edges.forEach(e => {
+      if (e.dataset.from === id || e.dataset.to === id) { e.classList.add('active'); e.classList.remove('dimmed'); }
+      else { e.classList.add('dimmed'); e.classList.remove('active'); }
+    });
+
+    // Update panel
+    const fields = Array.from(document.querySelectorAll(`.entity[data-id="${id}"] .field`))
+      .map(t => t.textContent.trim());
+    const pkg = document.querySelector(`.entity[data-id="${id}"] .pkg`)?.textContent || '';
+    const inb = edges.filter(e => e.dataset.to === id).map(e => e.dataset.from);
+    const out = edges.filter(e => e.dataset.from === id).map(e => e.dataset.to);
+
+    panel.innerHTML = `
+      <div class="meta">${pkg || 'entity'}</div>
+      <h3>${id}</h3>
+      ${fields.length ? `<h4>Fields</h4><ul>${fields.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}
+      ${out.length ? `<h4>Points at</h4><ul>${out.map(o => `<li>${o}</li>`).join('')}</ul>` : ''}
+      ${inb.length ? `<h4>Pointed at by</h4><ul>${inb.map(i => `<li>${i}</li>`).join('')}</ul>` : ''}
+      <span class="reset" onclick="reset()">↺ clear selection</span>
+    `;
+  }
+
+  entities.forEach(n => {
+    n.addEventListener('click', ev => { ev.stopPropagation(); focus(n.dataset.id); });
+  });
+  document.body.addEventListener('click', reset);
+</script>
+</body>
+</html>
